@@ -6,4 +6,5 @@ Node.js: javascript
 Express: API communication
 Mongoose: database connection
 MongoDB atlas: web database
+DotEnv: environment variables
 
