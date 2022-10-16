@@ -27,25 +27,25 @@ app.get("/user", (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
 
   if (credential.email == undefined || credential.password == undefined) {
-    res.status(400).json(); // bad request
+    res.status(400).send({}); // bad request
   } else {
     try {
       User.find(
         { email: credential.email, password: credential.password },
         function (err, user) {
           if (err) {
-            res.status(500).json({ error: err });
+            res.status(500).send({ error: err });
           } else {
             if (user.length == 0) {
-              res.status(404).json(); // not found
+              res.status(404).send({}); // not found
             } else {
-              res.status(200).send(JSON.stringify(user[0]._id));
+              res.status(200).send({id: `${user[0]._id}`});
             }
           }
         }
       );
     } catch (error) {
-      res.status(500).json();
+      res.status(500).send({});
     }
   }
 });
