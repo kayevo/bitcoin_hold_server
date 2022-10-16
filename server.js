@@ -23,14 +23,14 @@ app.post("/user", async (req, res) => {
   }
 });
 
-app.get("/user", (req, res) => {
+app.get("/user", async (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
 
   if (credential.email == undefined || credential.password == undefined) {
     res.status(400).json(); // bad request
   } else {
     try {
-      User.find({ email: credential.email, password: credential.password }, function (err, user) {
+      const query = await User.find({ email: credential.email, password: credential.password }, function (err, user) {
         if (err) {
           res.status(500).json({ error: err });
         } else {
