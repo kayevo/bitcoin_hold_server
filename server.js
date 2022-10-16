@@ -30,7 +30,7 @@ app.get("/user", (req, res) => {
     res.status(400).json(); // bad request
   } else {
     try {
-      User.find({ email: _email, password: _password }, function (err, user) {
+      User.find({ email: credential.email, password: credential.password }, function (err, user) {
         if (err) {
           res.status(500).json({ error: err });
         } else {
