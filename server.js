@@ -39,7 +39,7 @@ app.get("/user", (req, res) => {
             if (user.length == 0) {
               res.status(404).json(); // not found
             } else {
-              res.status(200).send(JSON.stringify(user[0].email));
+              res.status(200).send(JSON.stringify(user[0]._id));
             }
           }
         }
