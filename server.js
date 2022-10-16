@@ -9,7 +9,7 @@ databaseConnection();
 const app = express();
 
 app.post("/user", async (req, res) => {
-  const credential = new Credential(req.get("email"), req.get("password"));
+  const credential = new Credential(req.query.email, req.query.password);
 
   if (credential.email == undefined || credential.password == undefined) {
     res.status(400).json();
@@ -24,10 +24,9 @@ app.post("/user", async (req, res) => {
 });
 
 app.get("/user", (req, res) => {
-  const _email = req.get("email");
-  const _password = req.get("password");
+  const credential = new Credential(req.query.email, req.query.password);
 
-  if (_email == undefined || _password == undefined) {
+  if (credential.email == undefined || credential.password == undefined) {
     res.status(400).json(); // bad request
   } else {
     try {
@@ -49,7 +48,7 @@ app.get("/user", (req, res) => {
 });
 
 app.get("/user/email", (req, res) => {
-  const _email = req.get("email");
+  const _email = req.query.email;
 
   if (_email == undefined) {
     res.status(400).json(); // bad request
