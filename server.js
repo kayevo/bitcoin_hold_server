@@ -9,11 +9,9 @@ databaseConnection();
 const app = express();
 
 app.post("/user", async (req, res) => {
-  const email = req.get("email");
-  const password = req.get("password");
-  const credential = new Credential(email, password);
+  const credential = new Credential(req.get("email"), req.get("password"));
 
-  if (email == undefined || password == undefined) {
+  if (credential.email == undefined || credential.password == undefined) {
     res.status(400).json();
   } else {
     try {
@@ -30,7 +28,7 @@ app.get("/user", (req, res) => {
   const _password = req.get("password");
 
   if (_email == undefined || _password == undefined) {
-    res.status(400).json();
+    res.status(400).json(); // bad request
   } else {
     try {
       User.find({ email: _email, password: _password }, function (err, user) {
@@ -38,8 +36,11 @@ app.get("/user", (req, res) => {
           console.log(err);
           res.status(500).json({ error: err });
         } else {
-          console.log(docs);
-          res.status(200).json(docs);
+          if (user.length == 0) {
+            res.status(401).json(); // unauthorized
+          } else {
+            res.status(200).json();
+          }
         }
       });
     } catch (error) {
