@@ -33,13 +33,36 @@ app.get("/user", (req, res) => {
     try {
       User.find({ email: _email, password: _password }, function (err, user) {
         if (err) {
-          console.log(err);
           res.status(500).json({ error: err });
         } else {
           if (user.length == 0) {
-            res.status(401).json(); // unauthorized
+            res.status(404).json(); // not found
           } else {
             res.status(200).json(user.id);
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).json();
+    }
+  }
+});
+
+app.get("/user/email", (req, res) => {
+  const _email = req.get("email");
+
+  if (_email == undefined) {
+    res.status(400).json(); // bad request
+  } else {
+    try {
+      User.find({ email: _email}, function (err, user) {
+        if (err) {
+          res.status(500).json({ error: err });
+        } else {
+          if (user.length == 0) {
+            res.status(404).json(); // not found
+          } else {
+            res.status(200).json();
           }
         }
       });
