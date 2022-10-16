@@ -39,7 +39,7 @@ app.get("/user", (req, res) => {
           if (user.length == 0) {
             res.status(401).json(); // unauthorized
           } else {
-            res.status(200).json();
+            res.status(200).json(user.id);
           }
         }
       });
