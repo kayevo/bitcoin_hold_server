@@ -15,39 +15,36 @@ app.post("/user", async (req, res) => {
 
   if (email == undefined || password == undefined) {
     res.status(400).json();
+  } else {
+    try {
+      await User.create(credential);
+      res.status(201).json();
+    } catch (error) {
+      res.status(500).json();
+    }
   }
-
-  try {
-    await User.create(credential);
-    res.status(201).json();
-  } catch (error) {
-    res.status(500).json();
-  }
-  //res.send(JSON.stringify(user));
 });
 
 app.get("/user", (req, res) => {
   const _email = req.get("email");
   const _password = req.get("password");
-  // const credential = new Credential(_email, password);
 
   if (_email == undefined || _password == undefined) {
     res.status(400).json();
-  }
-
-  try {
-    User.find({ email: _email }, { password: _password }, function (err, docs) {
-      if (err) {
-        console.log(err);
-        res.status(400).json();
-      } else {
-        console.log("Second function call : ", docs);
-        res.status(200).json(docs);
-      }
-    });
-    // res.status(200).json();
-  } catch (error) {
-    res.status(500).json();
+  } else {
+    try {
+      User.find({ email: _email, password: _password }, function (err, user) {
+        if (err) {
+          console.log(err);
+          res.status(500).json({ error: err });
+        } else {
+          console.log(docs);
+          res.status(200).json(docs);
+        }
+      });
+    } catch (error) {
+      res.status(500).json();
+    }
   }
 });
 
