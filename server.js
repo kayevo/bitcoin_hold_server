@@ -3,6 +3,7 @@ const express = require("express");
 const databaseConnection = require("./data/database");
 const User = require("./entity/User");
 const Credential = require("./model/Credential");
+const emptyBody = {}
 
 databaseConnection();
 
@@ -12,13 +13,13 @@ app.post("/user", async (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
 
   if (credential.email == undefined || credential.password == undefined) {
-    res.status(400).json();
+    res.status(400).send(emptyBody);
   } else {
     try {
       await User.create(credential);
-      res.status(201).json();
+      res.status(201).send(emptyBody);
     } catch (error) {
-      res.status(500).json();
+      res.status(500).send(emptyBody);
     }
   }
 });
@@ -27,7 +28,7 @@ app.get("/user", (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
 
   if (credential.email == undefined || credential.password == undefined) {
-    res.status(400).send({}); // bad request
+    res.status(400).send(emptyBody); // bad request
   } else {
     try {
       User.find(
@@ -37,7 +38,7 @@ app.get("/user", (req, res) => {
             res.status(500).send({ error: err });
           } else {
             if (user.length == 0) {
-              res.status(404).send({}); // not found
+              res.status(404).send(emptyBody); // not found
             } else {
               res.status(200).send({id: `${user[0]._id}`});
             }
@@ -45,7 +46,7 @@ app.get("/user", (req, res) => {
         }
       );
     } catch (error) {
-      res.status(500).send({});
+      res.status(500).send(emptyBody)
     }
   }
 });
@@ -54,22 +55,22 @@ app.get("/user/email", (req, res) => {
   const _email = req.query.email;
 
   if (_email == undefined) {
-    res.status(400).json(); // bad request
+    res.status(400).send(emptyBody); // bad request
   } else {
     try {
       User.find({ email: _email }, function (err, user) {
         if (err) {
-          res.status(500).json({ error: err });
+          res.status(500).send({ error: err });
         } else {
           if (user.length == 0) {
-            res.status(404).json(); // not found
+            res.status(404).send(emptyBody); // not found
           } else {
-            res.status(200).json();
+            res.status(200).send(emptyBody);
           }
         }
       });
     } catch (error) {
-      res.status(500).json();
+      res.status(500).send(emptyBody);
     }
   }
 });
