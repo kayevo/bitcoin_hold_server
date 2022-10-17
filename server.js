@@ -3,7 +3,7 @@ const express = require("express");
 const databaseConnection = require("./data/database");
 const User = require("./entity/User");
 const Credential = require("./model/Credential");
-const emptyBody = {}
+const emptyBody = {};
 
 databaseConnection();
 
@@ -40,13 +40,13 @@ app.get("/user", (req, res) => {
             if (user.length == 0) {
               res.status(404).send(emptyBody); // not found
             } else {
-              res.status(200).send({id: `${user[0]._id}`});
+              res.status(200).send({ id: `${user[0]._id}` });
             }
           }
         }
       );
     } catch (error) {
-      res.status(500).send(emptyBody)
+      res.status(500).send(emptyBody);
     }
   }
 });
