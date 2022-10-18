@@ -1,7 +1,7 @@
 class BitcoinPortfolio{
-    constructor(_satoshiAmount, _averageBitcoinPrice) {
+    constructor(_satoshiAmount, _bitcoinAveragePrice) {
       this.satoshiAmount = _satoshiAmount;
-      this.averageBitcoinPrice = _averageBitcoinPrice;
+      this.bitcoinAveragePrice = _bitcoinAveragePrice;
     }
   }
 

@@ -5,7 +5,7 @@ const UserEntity = mongoose.model('User', {
     password: String,
     bitcoinPortfolio: {
       satoshiAmount: Number, // integer number in satoshis
-      averageBitcoinPrice: Number // decimal number with 2 decimals precision
+      bitcoinAveragePrice: Number // decimal number with 2 decimals precision
     }
 })
 
