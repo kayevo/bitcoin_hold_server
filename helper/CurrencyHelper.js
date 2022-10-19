@@ -16,4 +16,4 @@ class CurrencyHelper {
   }
 }
 
-module.exports = CurrencyHelper;
+module.exports = new CurrencyHelper();

@@ -10,7 +10,7 @@ function connectDadabase() {
   db.on("error", (error) => {
     console.error(error);
   });
-  db.once("open", () => console.log("Connected to the database."));
+  db.once("open", () => console.log("Database connected"));
 
   db.once("SIGUSR2", function () {
     db.kill(db.pid, "SIGUSR2");
