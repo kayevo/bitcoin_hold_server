@@ -76,4 +76,29 @@ app.get("/user/email", (req, res) => {
   }
 });
 
+app.get("/portfolio", (req, res) => {
+
+  const _userId = req.query.userId;
+
+  if (_userId == undefined) {
+    res.status(400).send(emptyBody); // bad request
+  } else {
+    try {
+      UserEntity.find({ _id: _userId }, function (err, user) {
+        if (err) {
+          res.status(500).send({ error: err });
+        } else {
+          if (user.length == 0) {
+            res.status(404).send(emptyBody); // not found
+          } else {
+            res.status(200).send(user[0].bitcoinPortfolio);
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).send(emptyBody);
+    }
+  }
+});
+
 app.listen(8080, () => console.log("Application started"));
