@@ -179,17 +179,21 @@ app.post("/portfolio/remove", (req, res) => {
             user.bitcoinPortfolio.bitcoinAveragePrice
           );
 
-          newPortfolio.removeFunds(_satoshiAmount);
+          if(_satoshiAmount > user.bitcoinPortfolio.satoshiAmount){
+            res.status(401).send(emptyBody);
+          }else{
+            newPortfolio.removeFunds(_satoshiAmount);
 
-          UserEntity.updateOne(
-            { _id: _userId },
-            { bitcoinPortfolio: newPortfolio },
-            function (err, user) {
-              if (!err && user) {
-                res.status(200).send(emptyBody);
+            UserEntity.updateOne(
+              { _id: _userId },
+              { bitcoinPortfolio: newPortfolio },
+              function (err, user) {
+                if (!err && user) {
+                  res.status(200).send(emptyBody);
+                }
               }
-            }
-          );
+            );
+          }          
         } else {
           res.status(500).send(emptyBody);
         }
