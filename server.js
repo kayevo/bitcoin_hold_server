@@ -174,14 +174,13 @@ app.post("/portfolio/remove", (req, res) => {
     try {
       UserEntity.findOne({ _id: _userId }, function (err, user) {
         if (!err && user) {
-          const newPortfolio = new BitcoinPortfolio(
-            user.bitcoinPortfolio.satoshiAmount,
-            user.bitcoinPortfolio.bitcoinAveragePrice
-          );
-
           if(_satoshiAmount > user.bitcoinPortfolio.satoshiAmount){
-            res.status(401).send(emptyBody);
+            res.status(401).send(emptyBody); // Unauthorized
           }else{
+            const newPortfolio = new BitcoinPortfolio(
+              user.bitcoinPortfolio.satoshiAmount,
+              user.bitcoinPortfolio.bitcoinAveragePrice
+            );
             newPortfolio.removeFunds(_satoshiAmount);
 
             UserEntity.updateOne(
