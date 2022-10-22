@@ -203,4 +203,42 @@ app.post("/portfolio/remove", (req, res) => {
   }
 });
 
+app.post("/portfolio/cutomize", (req, res) => {
+  const _userId = req.query.userId;
+  const _satoshiAmount = parseInt(req.query.satoshiAmount);
+  const _bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
+    parseFloat(req.query.bitcoinAveragePrice)
+  );
+
+  if (
+    _userId == undefined ||
+    _satoshiAmount == undefined ||
+    _bitcoinAveragePrice == undefined
+  ) {
+    res.status(400).send(emptyBody); // bad request
+  } else {
+    try {
+
+      const newPortfolio = new BitcoinPortfolio(
+        _satoshiAmount,
+        _bitcoinAveragePrice
+      );
+
+      UserEntity.updateOne(
+        { _id: _userId },
+        { bitcoinPortfolio: newPortfolio },
+        function (err, user) {
+          if (!err && user) {
+            res.status(200).send(emptyBody);
+          }else{
+            res.status(500).send(emptyBody);
+          }
+        }
+      );
+    } catch (error) {
+      res.status(500).send(emptyBody);
+    }
+  }
+});
+
 app.listen(8080, () => console.log("Server started"));
