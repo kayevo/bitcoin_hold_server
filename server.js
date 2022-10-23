@@ -203,7 +203,7 @@ app.post("/portfolio/remove", (req, res) => {
   }
 });
 
-app.post("/portfolio/cutomize", (req, res) => {
+app.post("/portfolio/customize", (req, res) => {
   const _userId = req.query.userId;
   const _satoshiAmount = parseInt(req.query.satoshiAmount);
   const _bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
