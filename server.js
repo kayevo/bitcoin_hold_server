@@ -2,10 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const databaseConnection = require("./data/database");
 const UserEntity = require("./entity/UserEntity");
+const AdsEntity = require("./entity/AdsEntity");
 const Credential = require("./model/Credential");
 const BitcoinPortfolio = require("./model/BitcoinPortfolio");
 const User = require("./model/User");
 const CurrencyHelper = require("./helper/CurrencyHelper");
+const Ads = require("./model/Ads");
 const emptyBody = {};
 
 databaseConnection();
@@ -165,18 +167,15 @@ app.post("/portfolio/remove", (req, res) => {
   const _userId = req.query.userId;
   const _satoshiAmount = parseInt(req.query.satoshiAmount);
 
-  if (
-    _userId == undefined ||
-    _satoshiAmount == undefined 
-  ) {
+  if (_userId == undefined || _satoshiAmount == undefined) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
       UserEntity.findOne({ _id: _userId }, function (err, user) {
         if (!err && user) {
-          if(_satoshiAmount > user.bitcoinPortfolio.satoshiAmount){
+          if (_satoshiAmount > user.bitcoinPortfolio.satoshiAmount) {
             res.status(401).send(emptyBody); // Unauthorized
-          }else{
+          } else {
             const newPortfolio = new BitcoinPortfolio(
               user.bitcoinPortfolio.satoshiAmount,
               user.bitcoinPortfolio.bitcoinAveragePrice
@@ -192,7 +191,7 @@ app.post("/portfolio/remove", (req, res) => {
                 }
               }
             );
-          }          
+          }
         } else {
           res.status(500).send(emptyBody);
         }
@@ -218,7 +217,6 @@ app.post("/portfolio/customize", (req, res) => {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
-
       const newPortfolio = new BitcoinPortfolio(
         _satoshiAmount,
         _bitcoinAveragePrice
@@ -230,11 +228,69 @@ app.post("/portfolio/customize", (req, res) => {
         function (err, user) {
           if (!err && user) {
             res.status(200).send(emptyBody);
-          }else{
+          } else {
             res.status(500).send(emptyBody);
           }
         }
       );
+    } catch (error) {
+      res.status(500).send(emptyBody);
+    }
+  }
+});
+
+app.get("/ads", (req, res) => {
+  try {
+    AdsEntity.find(function (err, ads) {
+      if (err) {
+        res.status(500).send({ error: err });
+      } else {
+        res.status(200).send(ads);
+      }
+    });
+  } catch (error) {
+    res.status(500).send(emptyBody);
+  }
+});
+
+app.get("/ads/title", (req, res) => {
+  const _title = req.query.title;
+
+  if (_title == undefined) {
+    res.status(400).send(emptyBody); // bad request
+  } else {
+    try {
+      AdsEntity.findOne({ title: _title }, function (err, ads) {
+        if (err) {
+          res.status(500).send({ error: err });
+        } else {
+          if (!ads) {
+            res.status(404).send(emptyBody); // not found
+          } else {
+            res.status(200).send(ads);
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).send(emptyBody);
+    }
+  }
+});
+
+app.post("/ads", async (req, res) => {
+  const _title = req.query.title;
+  const _posterUrl = req.query.posterUrl;
+  const _webLink = req.query.webLink;
+
+  const ads = new Ads(_title, _posterUrl, _webLink)
+
+  if (ads.title == undefined || ads.posterUrl == undefined
+    || ads.webLink == undefined) {
+    res.status(400).send(emptyBody); // bad request
+  } else {
+    try {
+      await AdsEntity.create(ads);
+      res.status(201).send(emptyBody); // created
     } catch (error) {
       res.status(500).send(emptyBody);
     }
