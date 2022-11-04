@@ -29,7 +29,7 @@ app.post("/user", async (req, res) => {
   }
 });
 
-app.get("/user", (req, res) => {
+app.get("/user/auth", (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
 
   if (credential.email == undefined || credential.password == undefined) {
@@ -37,7 +37,7 @@ app.get("/user", (req, res) => {
   } else {
     try {
       UserEntity.findOne(
-        { email: credential.email, password: credential.password },
+        { email: credential.email},
         function (err, user) {
           if (err) {
             res.status(500).send({ error: err });
@@ -45,7 +45,11 @@ app.get("/user", (req, res) => {
             if (!user) {
               res.status(404).send(emptyBody); // not found
             } else {
-              res.status(200).send({ id: `${user._id}` });
+              if(user.password == credential.password){
+                res.status(200).send({ id: `${user._id}` });
+              }else{
+                res.status(404).send(emptyBody); // not found
+              }
             }
           }
         }
@@ -282,15 +286,38 @@ app.post("/ads", async (req, res) => {
   const _posterUrl = req.query.posterUrl;
   const _webLink = req.query.webLink;
 
-  const ads = new Ads(_title, _posterUrl, _webLink)
+  const ads = new Ads(_title, _posterUrl, _webLink);
 
-  if (ads.title == undefined || ads.posterUrl == undefined
-    || ads.webLink == undefined) {
+  if (
+    ads.title == undefined ||
+    ads.posterUrl == undefined ||
+    ads.webLink == undefined
+  ) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
       await AdsEntity.create(ads);
       res.status(201).send(emptyBody); // created
+    } catch (error) {
+      res.status(500).send(emptyBody);
+    }
+  }
+});
+
+app.delete("/ads/remove", (req, res) => {
+  const _title = req.query.title;
+
+  if (_title == undefined) {
+    res.status(400).send(emptyBody); // bad request
+  } else {
+    try {
+      AdsEntity.deleteOne({ title: _title }, function (err, ads) {
+        if (!err && ads) {
+          res.status(200).send(emptyBody);
+        } else {
+          res.status(500).send(emptyBody);
+        }
+      });
     } catch (error) {
       res.status(500).send(emptyBody);
     }
