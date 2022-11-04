@@ -6,8 +6,14 @@ const AdsEntity = mongoose.model("Ads", {
     required: true,
     index: true, // index field
   },
-  posterUrl: String,
-  webLink: String,
+  posterUrl: {
+    type: String,
+    required: true,
+  },
+  webLink: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = AdsEntity;
