@@ -31,6 +31,7 @@ app.post("/user", async (req, res) => {
 
 app.get("/user/auth", (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
+  console.log(req.headers.api_key)
 
   if (credential.email == undefined || credential.password == undefined) {
     res.status(400).send(emptyBody); // bad request
