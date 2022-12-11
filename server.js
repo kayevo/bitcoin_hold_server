@@ -17,7 +17,11 @@ const app = express();
 app.post("/user", async (req, res) => {
   const user = new User(req.query.email, req.query.password);
 
-  if (user.email == undefined || user.password == undefined) {
+  if (
+    user.email == undefined ||
+    user.password == undefined ||
+    req.headers.api_key != process.env.APP_KEY
+  ) {
     res.status(400).send(emptyBody);
   } else {
     try {
@@ -32,28 +36,29 @@ app.post("/user", async (req, res) => {
 app.get("/user/auth", (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
 
-  if (credential.email == undefined || credential.password == undefined) {
+  if (
+    credential.email == undefined ||
+    credential.password == undefined ||
+    req.headers.api_key != process.env.APP_KEY
+  ) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
-      UserEntity.findOne(
-        { email: credential.email},
-        function (err, user) {
-          if (err) {
-            res.status(500).send({ error: err });
+      UserEntity.findOne({ email: credential.email }, function (err, user) {
+        if (err) {
+          res.status(500).send({ error: err });
+        } else {
+          if (!user) {
+            res.status(404).send(emptyBody); // not found
           } else {
-            if (!user) {
-              res.status(404).send(emptyBody); // not found
+            if (user.password == credential.password) {
+              res.status(200).send({ id: `${user._id}` });
             } else {
-              if(user.password == credential.password){
-                res.status(200).send({ id: `${user._id}` });
-              }else{
-                res.status(404).send(emptyBody); // not found
-              }
+              res.status(404).send(emptyBody); // not found
             }
           }
         }
-      );
+      });
     } catch (error) {
       res.status(500).send(emptyBody);
     }
@@ -63,7 +68,7 @@ app.get("/user/auth", (req, res) => {
 app.get("/user/email", (req, res) => {
   const _email = req.query.email;
 
-  if (_email == undefined) {
+  if (_email == undefined || req.headers.api_key != process.env.APP_KEY) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
@@ -87,7 +92,7 @@ app.get("/user/email", (req, res) => {
 app.get("/portfolio", (req, res) => {
   const _userId = req.query.userId;
 
-  if (_userId == undefined) {
+  if (_userId == undefined || req.headers.api_key != process.env.APP_KEY) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
@@ -108,22 +113,6 @@ app.get("/portfolio", (req, res) => {
   }
 });
 
-app.post("/portfolio/clean", (req, res) => {
-  const _userId = req.query.userId;
-
-  UserEntity.updateOne(
-    { _id: _userId },
-    { bitcoinPortfolio: { satoshiAmount: 0, bitcoinAveragePrice: 0 } },
-    function (err, user) {
-      if (!err && user) {
-        res.status(200).send(emptyBody);
-      } else {
-        res.status(500).send(emptyBody);
-      }
-    }
-  );
-});
-
 app.post("/portfolio/add", (req, res) => {
   const _userId = req.query.userId;
   const _satoshiAmount = parseInt(req.query.satoshiAmount);
@@ -134,7 +123,8 @@ app.post("/portfolio/add", (req, res) => {
   if (
     _userId == undefined ||
     _satoshiAmount == undefined ||
-    _bitcoinAveragePrice == undefined
+    _bitcoinAveragePrice == undefined ||
+    req.headers.api_key != process.env.APP_KEY
   ) {
     res.status(400).send(emptyBody); // bad request
   } else {
@@ -171,7 +161,11 @@ app.post("/portfolio/remove", (req, res) => {
   const _userId = req.query.userId;
   const _satoshiAmount = parseInt(req.query.satoshiAmount);
 
-  if (_userId == undefined || _satoshiAmount == undefined) {
+  if (
+    _userId == undefined ||
+    _satoshiAmount == undefined ||
+    req.headers.api_key != process.env.APP_KEY
+  ) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
@@ -216,7 +210,8 @@ app.post("/portfolio/customize", (req, res) => {
   if (
     _userId == undefined ||
     _satoshiAmount == undefined ||
-    _bitcoinAveragePrice == undefined
+    _bitcoinAveragePrice == undefined ||
+    req.headers.api_key != process.env.APP_KEY
   ) {
     res.status(400).send(emptyBody); // bad request
   } else {
@@ -244,23 +239,27 @@ app.post("/portfolio/customize", (req, res) => {
 });
 
 app.get("/ads", (req, res) => {
-  try {
-    AdsEntity.find(function (err, ads) {
-      if (err) {
-        res.status(500).send({ error: err });
-      } else {
-        res.status(200).send(ads);
-      }
-    });
-  } catch (error) {
-    res.status(500).send(emptyBody);
+  if(req.headers.api_key != process.env.APP_KEY){
+    res.status(400).send(emptyBody); // bad request
+  }else{
+    try {
+      AdsEntity.find(function (err, ads) {
+        if (err) {
+          res.status(500).send({ error: err });
+        } else {
+          res.status(200).send(ads);
+        }
+      });
+    } catch (error) {
+      res.status(500).send(emptyBody);
+    }
   }
 });
 
 app.get("/ads/title", (req, res) => {
   const _title = req.query.title;
 
-  if (_title == undefined) {
+  if (_title == undefined || req.headers.api_key != process.env.APP_KEY) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
@@ -291,7 +290,8 @@ app.post("/ads", async (req, res) => {
   if (
     ads.title == undefined ||
     ads.posterUrl == undefined ||
-    ads.webLink == undefined
+    ads.webLink == undefined ||
+    req.headers.api_key != process.env.APP_KEY
   ) {
     res.status(400).send(emptyBody); // bad request
   } else {
@@ -307,7 +307,7 @@ app.post("/ads", async (req, res) => {
 app.delete("/ads/remove", (req, res) => {
   const _title = req.query.title;
 
-  if (_title == undefined) {
+  if (_title == undefined || req.headers.api_key != process.env.APP_KEY) {
     res.status(400).send(emptyBody); // bad request
   } else {
     try {
