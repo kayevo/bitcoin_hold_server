@@ -18,15 +18,24 @@ app.post("/user", async (req, res) => {
   const user = new User(req.query.email, req.query.password);
 
   if (
-    user.email == undefined ||
-    user.password == undefined ||
-    req.headers.api_key != process.env.APP_KEY
+    user.email == undefined 
+    || user.password == undefined 
+    || req.headers.api_key != process.env.APP_KEY
   ) {
     res.status(400).send(emptyBody);
   } else {
     try {
+      await UserEntity.create(user, (err) => {
+        if (err) {
+          res.status(500).send(emptyBody);
+        } else {
+          res.status(201).send(emptyBody);
+        }
+      });
+      /*
       await UserEntity.create(user);
       res.status(201).send(emptyBody);
+      */
     } catch (error) {
       res.status(500).send(emptyBody);
     }
