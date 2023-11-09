@@ -2,8 +2,8 @@ const Credential = require("./Credential");
 const BitcoinPortfolio = require("./BitcoinPortfolio");
 
 class User extends Credential {
-  constructor(_email, _password) {
-    super(_email, _password)
+  constructor(_email, _passwordHash) {
+    super(_email, _passwordHash)
     this.bitcoinPortfolio = new BitcoinPortfolio(0, 0)
   }
 }
