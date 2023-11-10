@@ -8,28 +8,10 @@ const BitcoinPortfolio = require("./model/BitcoinPortfolio");
 const User = require("./model/User");
 const CurrencyHelper = require("./helper/CurrencyHelper");
 const Ads = require("./model/Ads");
-const bcrypt = require("bcrypt");
 
 databaseConnection();
 
 const app = express();
-
-const getHashFromPassword = (_password) => {
-  return new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) {
-        reject(new Error("Error: generating password."));
-      }
-
-      bcrypt.hash(_password, salt, (err, hash) => {
-        if (err) {
-          reject(new Error("Error: generating password."));
-        }
-        resolve(hash);
-      });
-    });
-  });
-};
 
 app.post("/user", async (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
@@ -43,7 +25,8 @@ app.post("/user", async (req, res) => {
     res.status(400).send({});
   } else {
     try {
-      getHashFromPassword(credential.password)
+      credential
+        .getHashFromPassword()
         .then((hash) => {
           return UserEntity.create(new User(credential.email, hash));
         })
@@ -78,19 +61,18 @@ app.get("/user/auth", (req, res) => {
           if (!user) {
             res.status(404).send({}); // not found
           } else {
-            bcrypt.compare(
-              credential.password,
-              user.passwordHash,
-              (err, result) => {
-                if (err) {
-                  res.status(404).send({}); // Password comparison failed
-                } else if (result) {
+            credential
+              .validatePasswordForHash(user.passwordHash)
+              .then((isPasswordValidForHash) => {
+                if (isPasswordValidForHash) {
                   res.status(200).send({ id: `${user._id}` }); // Passwords match
                 } else {
-                  res.status(404).send({}); // Passwords don't match
+                  res.status(404).send({});
                 }
-              }
-            );
+              })
+              .catch((error) => {
+                res.status(500).send({});
+              });
           }
         }
       });
