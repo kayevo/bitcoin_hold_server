@@ -21,13 +21,12 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-/*
 userSchema.plugin(encrypt, {
   encryptionKey: encKey,
   signingKey: sigKey,
-  encryptedFields: ["passwordHash"],
+  encryptedFields: ["passwordHash", "bitcoinPortfolio"],
 });
-*/
+
 
 const UserEntity = mongoose.model("User", userSchema);
 
