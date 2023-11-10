@@ -33,7 +33,7 @@ const getHashFromPassword = (_password) => {
 
 app.post("/user", async (req, res) => {
   const user = new User(req.query.email, req.query.password);
-  const appKey = req.headers.api_key
+  const appKey = req.headers.api_key;
 
   if (
     user.email == undefined ||
@@ -45,14 +45,12 @@ app.post("/user", async (req, res) => {
     try {
       getHashFromPassword(user.password)
         .then((hash) => {
-          return UserEntity.create({
-            email: user.email,
+          const { password, ...userWithoutPassword } = user;
+          const userWithHashPassword = {
+            ...userWithoutPassword,
             passwordHash: hash,
-            bitcoinPortfolio: {
-              satoshiAmount: user.satoshiAmount,
-              bitcoinAveragePrice: user.bitcoinAveragePrice,
-            },
-          });
+          };
+          return UserEntity.create(userWithHashPassword);
         })
         .then((createdUser) => {
           res.status(201).send({});
