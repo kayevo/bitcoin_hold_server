@@ -32,25 +32,20 @@ const getHashFromPassword = (_password) => {
 };
 
 app.post("/user", async (req, res) => {
-  const user = new User(req.query.email, req.query.password);
+  const credential = new Credential(req.query.email, req.query.password);
   const appKey = req.headers.api_key;
 
   if (
-    user.email == undefined ||
-    user.password == undefined ||
+    credential.email == undefined ||
+    credential.password == undefined ||
     appKey != process.env.APP_KEY
   ) {
     res.status(400).send({});
   } else {
     try {
-      getHashFromPassword(user.password)
+      getHashFromPassword(credential.password)
         .then((hash) => {
-          const { password, ...userWithoutPassword } = user;
-          const userWithHashPassword = {
-            ...userWithoutPassword,
-            passwordHash: hash,
-          };
-          return UserEntity.create(userWithHashPassword);
+          return UserEntity.create(new User(credential.email, hash));
         })
         .then((createdUser) => {
           res.status(201).send({});
@@ -66,11 +61,12 @@ app.post("/user", async (req, res) => {
 
 app.get("/user/auth", (req, res) => {
   const credential = new Credential(req.query.email, req.query.password);
+  const appKey = req.headers.api_key;
 
   if (
     credential.email == undefined ||
     credential.password == undefined ||
-    req.headers.api_key != process.env.APP_KEY
+    appKey != process.env.APP_KEY
   ) {
     res.status(400).send({}); // bad request
   } else {
@@ -82,27 +78,15 @@ app.get("/user/auth", (req, res) => {
           if (!user) {
             res.status(404).send({}); // not found
           } else {
-            //
-            const storedHash = user.password;
-            const userProvidedPassword = credential.password;
-
-            bcrypt.compare(userProvidedPassword, storedHash, (err, result) => {
+            bcrypt.compare(credential.password, user.passwordHash, (err, result) => {
               if (err) {
-                res.status(404).send({}); // Handle the error, e.g., password comparison failed
+                res.status(404).send({}); // Password comparison failed
               } else if (result) {
                 res.status(200).send({ id: `${user._id}` }); // Passwords match
               } else {
                 res.status(404).send({}); // Passwords don't match
               }
             });
-            //
-            /*
-            if (user.password == credential.password) {
-              res.status(200).send({ id: `${user._id}` });
-            } else {
-              res.status(404).send({}); // not found
-            }
-            */
           }
         }
       });
