@@ -97,13 +97,14 @@ app.get("/user/auth", (req, res) => {
 });
 
 app.get("/user/email", (req, res) => {
-  const _email = req.query.email;
+  const email = req.query.email;
+  const appKey = req.headers.api_key;
 
-  if (_email == undefined || req.headers.api_key != process.env.APP_KEY) {
+  if (email == undefined || appKey != process.env.APP_KEY) {
     res.status(400).send({}); // bad request
   } else {
     try {
-      UserEntity.findOne({ email: _email }, function (err, user) {
+      UserEntity.findOne({ email: email }, function (err, user) {
         if (err) {
           res.status(500).send({ error: err });
         } else {
