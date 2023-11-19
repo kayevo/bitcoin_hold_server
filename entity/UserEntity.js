@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
-const bcrypt = require('bcrypt');
+const fieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 
-var encKey = process.env.ENC_KEY_32BYTE_BASE64;
-var sigKey = process.env.SIG_KEY_64BYTE_BASE64;
+var encryptionKey = process.env.DATABASE_ENCRYPTION_KEY;
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -21,12 +19,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.plugin(encrypt, {
-  encryptionKey: encKey,
-  signingKey: sigKey,
-  encryptedFields: ["passwordHash", "bitcoinPortfolio"],
+userSchema.plugin(fieldEncryption, {
+  secret: encryptionKey,
+  fields: ["bitcoinPortfolio", "passwordHash"],
 });
-
 
 const UserEntity = mongoose.model("User", userSchema);
 

@@ -8,6 +8,7 @@ const BitcoinPortfolio = require("./model/BitcoinPortfolio");
 const User = require("./model/User");
 const CurrencyHelper = require("./helper/CurrencyHelper");
 const Ads = require("./model/Ads");
+const { deleteMockUsers } = require("./helper/DatabaseHelper");
 
 databaseConnection();
 
@@ -54,26 +55,23 @@ app.get("/user/auth", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      UserEntity.findOne({ email: credential.email }, function (err, user) {
-        if (err) {
-          res.status(500).send({ error: err });
+      UserEntity.findOne({ email: credential.email }).then((user) => {
+        if (user.errors) throw Error();
+        if (!user) {
+          res.status(404).send({}); // not found
         } else {
-          if (!user) {
-            res.status(404).send({}); // not found
-          } else {
-            credential
-              .validatePasswordForHash(user.passwordHash)
-              .then((isPasswordValidForHash) => {
-                if (isPasswordValidForHash) {
-                  res.status(200).send({ id: `${user._id}` }); // Passwords match
-                } else {
-                  res.status(404).send({});
-                }
-              })
-              .catch((error) => {
-                res.status(500).send({});
-              });
-          }
+          credential
+            .validatePasswordForHash(user.passwordHash)
+            .then((isPasswordValidForHash) => {
+              if (isPasswordValidForHash) {
+                res.status(200).send({ id: `${user._id}` }); // Passwords match
+              } else {
+                res.status(404).send({});
+              }
+            })
+            .catch((error) => {
+              res.status(500).send({});
+            });
         }
       });
     } catch (error) {
@@ -90,15 +88,12 @@ app.get("/user/email", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      UserEntity.findOne({ email: email }, function (err, user) {
-        if (err) {
-          res.status(500).send({ error: err });
+      UserEntity.findOne({ email: email }).then((user) => {
+        if (user.errors) throw Error();
+        if (!user) {
+          res.status(404).send({}); // not found
         } else {
-          if (!user) {
-            res.status(404).send({}); // not found
-          } else {
-            res.status(200).send({});
-          }
+          res.status(200).send({});
         }
       });
     } catch (error) {
@@ -115,15 +110,12 @@ app.get("/portfolio", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      UserEntity.findOne({ _id: userId }, function (err, user) {
-        if (err) {
-          res.status(500).send({ error: err });
+      UserEntity.findOne({ _id: userId }).then((user) => {
+        if (user.errors) throw Error();
+        if (!user) {
+          res.status(404).send({}); // not found
         } else {
-          if (!user) {
-            res.status(404).send({}); // not found
-          } else {
-            res.status(200).send(user.bitcoinPortfolio);
-          }
+          res.status(200).send(user.bitcoinPortfolio);
         }
       });
     } catch (error) {
@@ -149,24 +141,20 @@ app.post("/portfolio/add", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      UserEntity.findOne({ _id: userId }, function (err, user) {
-        if (!err && user) {
+      UserEntity.findOne({ _id: userId }).then((user) => {
+        if (user) {
           const newPortfolio = new BitcoinPortfolio(
             user.bitcoinPortfolio.satoshiAmount,
             user.bitcoinPortfolio.bitcoinAveragePrice
           );
 
           newPortfolio.addFunds(satoshiAmount, bitcoinAveragePrice);
-
           UserEntity.updateOne(
             { _id: userId },
-            { bitcoinPortfolio: newPortfolio },
-            function (err, user) {
-              if (!err && user) {
-                res.status(200).send({});
-              }
-            }
-          );
+            { bitcoinPortfolio: newPortfolio }
+          ).then((user) => {
+            if (!user.errors && user) res.status(200).send({});
+          });
         } else {
           res.status(500).send({});
         }
@@ -190,8 +178,8 @@ app.post("/portfolio/remove", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      UserEntity.findOne({ _id: userId }, function (err, user) {
-        if (!err && user) {
+      UserEntity.findOne({ _id: userId }).then((user) => {
+        if (!user.errors && user) {
           if (satoshiAmount > user.bitcoinPortfolio.satoshiAmount) {
             res.status(401).send({}); // Unauthorized
           } else {
@@ -203,13 +191,12 @@ app.post("/portfolio/remove", (req, res) => {
 
             UserEntity.updateOne(
               { _id: userId },
-              { bitcoinPortfolio: newPortfolio },
-              function (err, user) {
-                if (!err && user) {
-                  res.status(200).send({});
-                }
+              { bitcoinPortfolio: newPortfolio }
+            ).then((user) => {
+              if (!user.errors && user) {
+                res.status(200).send({});
               }
-            );
+            });
           }
         } else {
           res.status(500).send({});
@@ -245,15 +232,14 @@ app.post("/portfolio/customize", (req, res) => {
 
       UserEntity.updateOne(
         { _id: userId },
-        { bitcoinPortfolio: newPortfolio },
-        function (err, user) {
-          if (!err && user) {
-            res.status(200).send({});
-          } else {
-            res.status(500).send({});
-          }
+        { bitcoinPortfolio: newPortfolio }
+      ).then((user) => {
+        if (!user.errors && user) {
+          res.status(200).send({});
+        } else {
+          res.status(500).send({});
         }
-      );
+      });
     } catch (error) {
       res.status(500).send({});
     }
@@ -267,9 +253,9 @@ app.get("/ads", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      AdsEntity.find(function (err, ads) {
-        if (err) {
-          res.status(500).send({ error: err });
+      AdsEntity.find().then((ads) => {
+        if (ads.errors) {
+          res.status(500).send({ error: ads.errors });
         } else {
           res.status(200).send(ads);
         }
@@ -288,9 +274,9 @@ app.get("/ads/title", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      AdsEntity.findOne({ title: title }, function (err, ads) {
-        if (err) {
-          res.status(500).send({ error: err });
+      AdsEntity.findOne({ title: title }).then((ads) => {
+        if (ads.errors) {
+          res.status(500).send({ error: ads.errors });
         } else {
           if (!ads) {
             res.status(404).send({}); // not found
@@ -338,8 +324,8 @@ app.delete("/ads/remove", (req, res) => {
     res.status(400).send({}); // bad request
   } else {
     try {
-      AdsEntity.deleteOne({ title: title }, function (err, ads) {
-        if (!err && ads) {
+      AdsEntity.deleteOne({ title: title }).then((ads) => {
+        if (!ads.errors && ads) {
           res.status(200).send({});
         } else {
           res.status(500).send({});
