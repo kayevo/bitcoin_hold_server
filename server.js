@@ -56,7 +56,7 @@ app.get("/user/auth", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ email: credential.email }).then((user) => {
-        if (user.errors) throw Error();
+        if (user?.errors) res.status(500).send({});
         if (!user) {
           res.status(404).send({}); // not found
         } else {
@@ -89,7 +89,7 @@ app.get("/user/email", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ email: email }).then((user) => {
-        if (user.errors) throw Error();
+        if (user?.errors) res.status(500).send({});
         if (!user) {
           res.status(404).send({}); // not found
         } else {
@@ -111,7 +111,7 @@ app.get("/portfolio", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ _id: userId }).then((user) => {
-        if (user.errors) throw Error();
+        if (user?.errors) res.status(500).send({});
         if (!user) {
           res.status(404).send({}); // not found
         } else {
@@ -153,7 +153,11 @@ app.post("/portfolio/add", (req, res) => {
             { _id: userId },
             { bitcoinPortfolio: newPortfolio }
           ).then((user) => {
-            if (!user.errors && user) res.status(200).send({});
+            if (!user?.errors && user) {
+              res.status(200).send({});
+            } else {
+              res.status(500).send({});
+            }
           });
         } else {
           res.status(500).send({});
@@ -179,7 +183,7 @@ app.post("/portfolio/remove", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ _id: userId }).then((user) => {
-        if (!user.errors && user) {
+        if (!user?.errors && user) {
           if (satoshiAmount > user.bitcoinPortfolio.satoshiAmount) {
             res.status(401).send({}); // Unauthorized
           } else {
@@ -193,8 +197,10 @@ app.post("/portfolio/remove", (req, res) => {
               { _id: userId },
               { bitcoinPortfolio: newPortfolio }
             ).then((user) => {
-              if (!user.errors && user) {
+              if (!user?.errors && user) {
                 res.status(200).send({});
+              } else {
+                res.status(500).send({});
               }
             });
           }
@@ -234,7 +240,7 @@ app.post("/portfolio/customize", (req, res) => {
         { _id: userId },
         { bitcoinPortfolio: newPortfolio }
       ).then((user) => {
-        if (!user.errors && user) {
+        if (!user?.errors && user) {
           res.status(200).send({});
         } else {
           res.status(500).send({});
