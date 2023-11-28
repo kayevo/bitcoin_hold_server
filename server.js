@@ -27,18 +27,21 @@ app.post("/user", async (req, res) => {
   } else {
     try {
       UserEntity.findOne({ email: credential.email }).then((user) => {
-        if (user) res.status(409).send({}); // user already exist
-        credential
-          .getHashFromPassword()
-          .then((hash) => {
-            return UserEntity.create(new User(credential.email, hash));
-          })
-          .then((createdUser) => {
-            res.status(201).send({});
-          })
-          .catch((error) => {
-            res.status(500).send({});
-          });
+        if (user) {
+          res.status(409).send({}); // user already exists
+        } else {
+          credential
+            .getHashFromPassword()
+            .then((hash) => {
+              return UserEntity.create(new User(credential.email, hash));
+            })
+            .then((createdUser) => {
+              res.status(201).send({});
+            })
+            .catch((error) => {
+              res.status(500).send({});
+            });
+        }
       });
     } catch (error) {
       res.status(500).send({});
@@ -59,22 +62,25 @@ app.get("/user/auth", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ email: credential.email }).then((user) => {
-        if (user?.errors) res.status(500).send({});
         if (!user) {
           res.status(404).send({}); // not found
         } else {
-          credential
-            .validatePasswordForHash(user.passwordHash)
-            .then((isPasswordValidForHash) => {
-              if (isPasswordValidForHash) {
-                res.status(200).send({ id: `${user._id}` }); // Passwords match
-              } else {
-                res.status(404).send({});
-              }
-            })
-            .catch((error) => {
-              res.status(500).send({});
-            });
+          if (user?.errors) {
+            res.status(500).send({});
+          } else {
+            credential
+              .validatePasswordForHash(user.passwordHash)
+              .then((isPasswordValidForHash) => {
+                if (isPasswordValidForHash) {
+                  res.status(200).send({ id: `${user._id}` }); // Passwords match
+                } else {
+                  res.status(404).send({});
+                }
+              })
+              .catch((error) => {
+                res.status(500).send({});
+              });
+          }
         }
       });
     } catch (error) {
@@ -92,11 +98,14 @@ app.get("/user/email", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ email: email }).then((user) => {
-        if (user?.errors) res.status(500).send({});
         if (!user) {
           res.status(404).send({}); // not found
         } else {
-          res.status(200).send({});
+          if (user?.errors) {
+            res.status(500).send({});
+          } else {
+            res.status(200).send({});
+          }
         }
       });
     } catch (error) {
@@ -114,11 +123,14 @@ app.get("/portfolio", (req, res) => {
   } else {
     try {
       UserEntity.findOne({ _id: userId }).then((user) => {
-        if (user?.errors) res.status(500).send({});
         if (!user) {
           res.status(404).send({}); // not found
         } else {
-          res.status(200).send(user.bitcoinPortfolio);
+          if (user?.errors) {
+            res.status(500).send({});
+          } else {
+            res.status(200).send(user.bitcoinPortfolio);
+          }
         }
       });
     } catch (error) {
@@ -263,8 +275,8 @@ app.get("/ads", (req, res) => {
   } else {
     try {
       AdsEntity.find().then((ads) => {
-        if (ads.errors) {
-          res.status(500).send({ error: ads.errors });
+        if (ads?.errors) {
+          res.status(500).send({ error: ads?.errors });
         } else {
           res.status(200).send(ads);
         }
@@ -284,11 +296,11 @@ app.get("/ads/title", (req, res) => {
   } else {
     try {
       AdsEntity.findOne({ title: title }).then((ads) => {
-        if (ads.errors) {
-          res.status(500).send({ error: ads.errors });
+        if (!ads) {
+          res.status(404).send({}); // not found
         } else {
-          if (!ads) {
-            res.status(404).send({}); // not found
+          if (ads?.errors) {
+            res.status(500).send({ error: ads?.errors });
           } else {
             res.status(200).send(ads);
           }
@@ -334,7 +346,7 @@ app.delete("/ads/remove", (req, res) => {
   } else {
     try {
       AdsEntity.deleteOne({ title: title }).then((ads) => {
-        if (!ads.errors && ads) {
+        if (!ads?.errors && ads) {
           res.status(200).send({});
         } else {
           res.status(500).send({});
