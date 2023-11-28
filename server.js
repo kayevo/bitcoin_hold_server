@@ -26,17 +26,20 @@ app.post("/user", async (req, res) => {
     res.status(400).send({});
   } else {
     try {
-      credential
-        .getHashFromPassword()
-        .then((hash) => {
-          return UserEntity.create(new User(credential.email, hash));
-        })
-        .then((createdUser) => {
-          res.status(201).send({});
-        })
-        .catch((error) => {
-          res.status(500).send({});
-        });
+      UserEntity.findOne({ email: credential.email }).then((user) => {
+        if (user) res.status(409).send({}); // user already exist
+        credential
+          .getHashFromPassword()
+          .then((hash) => {
+            return UserEntity.create(new User(credential.email, hash));
+          })
+          .then((createdUser) => {
+            res.status(201).send({});
+          })
+          .catch((error) => {
+            res.status(500).send({});
+          });
+      });
     } catch (error) {
       res.status(500).send({});
     }
