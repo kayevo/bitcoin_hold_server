@@ -1,15 +1,7 @@
 require("dotenv").config();
-const express = require("express");
-const databaseConnection = require(".././data/database");
 const UserEntity = require(".././entity/UserEntity");
-const AdsEntity = require(".././entity/AdsEntity");
-const Credential = require(".././model/Credential");
 const BitcoinPortfolio = require(".././model/BitcoinPortfolio");
-const User = require(".././model/User");
 const CurrencyHelper = require(".././helper/CurrencyHelper");
-const Ads = require(".././model/Ads");
-const { deleteMockUsers } = require(".././helper/DatabaseHelper");
-const loginRouter = require(".././router/LoginRouter");
 
 class PortfolioController {
   async getPortfolio(req, res) {
