@@ -4,7 +4,7 @@ const Ads = require(".././model/Ads");
 
 class AdsController {
   async getAds(req, res) {
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
@@ -25,7 +25,7 @@ class AdsController {
 
   async getAdsByTitle(req, res) {
     const title = req.query.title;
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (title == undefined || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
@@ -52,7 +52,7 @@ class AdsController {
     const title = req.query.title;
     const posterUrl = req.query.posterUrl;
     const webLink = req.query.webLink;
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     const ads = new Ads(title, posterUrl, webLink);
 
@@ -75,7 +75,7 @@ class AdsController {
 
   async deleteAds(req, res) {
     const title = req.query.title;
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (title == undefined || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request

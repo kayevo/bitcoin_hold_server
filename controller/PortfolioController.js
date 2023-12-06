@@ -5,8 +5,8 @@ const CurrencyHelper = require(".././helper/CurrencyHelper");
 
 class PortfolioController {
   async getPortfolio(req, res) {
-    const userId = req.query.userId ?? req.query.user_id;
-    const appKey = req.headers.api_key;
+    const userId = req.query.userId;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (userId == undefined || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
@@ -30,12 +30,12 @@ class PortfolioController {
   }
 
   async setPortfolio(req, res) {
-    const userId = req.query.userId ?? req.query.user_id;
+    const userId = req.query.userId;
     const satoshiAmount = parseInt(req.query.satoshiAmount);
     const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
       parseFloat(req.query.bitcoinAveragePrice)
     );
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (
       userId == undefined ||
@@ -68,12 +68,12 @@ class PortfolioController {
   }
 
   async addValue(req, res) {
-    const userId = req.query.userId ?? req.query.user_id;
+    const userId = req.query.userId;
     const satoshiAmount = parseInt(req.query.satoshiAmount);
     const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
       parseFloat(req.query.bitcoinAveragePrice)
     );
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (
       userId == undefined ||
@@ -113,9 +113,9 @@ class PortfolioController {
   }
 
   async removeValue(req, res) {
-    const userId = req.query.userId ?? req.query.user_id;
+    const userId = req.query.userId;
     const satoshiAmount = parseInt(req.query.satoshiAmount);
-    const appKey = req.headers.api_key;
+    const appKey = req.headers.api_key ?? req.headers.apiKey;
 
     if (
       userId == undefined ||
