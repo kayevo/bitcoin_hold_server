@@ -18,7 +18,7 @@ class BitcoinController {
         headers: headers,
       })
       .then((response) => {
-        res.status(200).send({ PRICE_BRL: response.data.BRL });
+        res.status(200).send({ priceBrl: response.data.BRL });
       })
       .catch((error) => {
         res.status(500).send({});
