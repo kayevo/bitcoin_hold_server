@@ -6,7 +6,7 @@ const User = require(".././model/User");
 class LoginController {
   async createUser(req, res) {
     const credential = new Credential(req.query.email, req.query.password);
-    const appKey = req.headers.api_key ?? req.headers.apiKey;
+    const appKey = req.headers.api_key;
 
     if (
       credential.email == undefined ||
@@ -41,7 +41,7 @@ class LoginController {
 
   async getUser(req, res) {
     const credential = new Credential(req.query.email, req.query.password);
-    const appKey = req.headers.api_key ?? req.headers.apiKey;
+    const appKey = req.headers.api_key;
 
     if (
       credential.email == undefined ||
@@ -82,7 +82,7 @@ class LoginController {
   // TODO deprecated method, should be removed, create user method already verify if user exists
   async existsUser(req, res) {
     const email = req.query.email;
-    const appKey = req.headers.api_key ?? req.headers.apiKey;
+    const appKey = req.headers.api_key;
 
     if (email == undefined || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
