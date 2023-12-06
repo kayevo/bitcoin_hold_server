@@ -5,7 +5,7 @@ const CurrencyHelper = require(".././helper/CurrencyHelper");
 
 class PortfolioController {
   async getPortfolio(req, res) {
-    const userId = req.query.userId;
+    const userId = req.query.userId ?? req.query.user_id;
     const appKey = req.headers.api_key;
 
     if (userId == undefined || appKey != process.env.APP_KEY) {
@@ -30,7 +30,7 @@ class PortfolioController {
   }
 
   async setPortfolio(req, res) {
-    const userId = req.query.userId;
+    const userId = req.query.userId ?? req.query.user_id;
     const satoshiAmount = parseInt(req.query.satoshiAmount);
     const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
       parseFloat(req.query.bitcoinAveragePrice)
@@ -68,7 +68,7 @@ class PortfolioController {
   }
 
   async addValue(req, res) {
-    const userId = req.query.userId;
+    const userId = req.query.userId ?? req.query.user_id;
     const satoshiAmount = parseInt(req.query.satoshiAmount);
     const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
       parseFloat(req.query.bitcoinAveragePrice)
@@ -113,7 +113,7 @@ class PortfolioController {
   }
 
   async removeValue(req, res) {
-    const userId = req.query.userId;
+    const userId = req.query.userId ?? req.query.user_id;
     const satoshiAmount = parseInt(req.query.satoshiAmount);
     const appKey = req.headers.api_key;
 
