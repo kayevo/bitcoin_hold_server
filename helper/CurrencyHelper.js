@@ -11,9 +11,18 @@ class CurrencyHelper {
     return _bitcoinValue * Math.pow(10, 8);
   }
 
-  satoshiPriceToBitcoinPrice(_bitcoinValue) {
-    return _bitcoinValue * Math.pow(10, 8);
+  parseSatoshiToBitcoin(_bitcoinValue) {
+    return _bitcoinValue / Math.pow(10, 8);
   }
+
+  calculatePercentageProfit(_value, _valueWithProfit) {
+    if (_value === 0) {
+        return 0.0;
+    }
+
+    const percentageProfit = ((_valueWithProfit - _value) / _value) * 100.0;
+    return percentageProfit;
+}
 }
 
 module.exports = new CurrencyHelper();
