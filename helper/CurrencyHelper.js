@@ -4,7 +4,7 @@ class CurrencyHelper {
   }
 
   parseToCurrency(_value) {
-    return parseFloat(_value.toFixed(2))
+    return parseFloat(_value.toFixed(2));
   }
 
   parseBitcoinToSatoshi(_bitcoinValue) {
@@ -17,12 +17,12 @@ class CurrencyHelper {
 
   calculatePercentageProfit(_value, _valueWithProfit) {
     if (_value === 0) {
-        return 0.0;
+      return 0.0;
     }
 
     const percentageProfit = ((_valueWithProfit - _value) / _value) * 100.0;
     return percentageProfit;
-}
+  }
 }
 
 module.exports = new CurrencyHelper();

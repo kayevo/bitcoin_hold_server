@@ -6,11 +6,11 @@ class BitcoinPortfolio {
     this.bitcoinAveragePrice = _bitcoinAveragePrice;
   }
 
-  addFunds(_funds, _payedPrice) {
+  addFunds(_funds, _paidPrice) {
     this.satoshiAmount += _funds;
     this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
       CurrencyHelper.parseBitcoinToSatoshi(
-        (this.bitcoinAveragePrice + _payedPrice) / this.satoshiAmount
+        (this.bitcoinAveragePrice + _paidPrice) / this.satoshiAmount
       )
     );
   }
