@@ -27,7 +27,7 @@ class AdsController {
     const title = req.query.title;
     const appKey = req.headers.api_key;
 
-    if (title == undefined || appKey != process.env.APP_KEY) {
+    if (title == null || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
     } else {
       try {
@@ -54,16 +54,15 @@ class AdsController {
     const webLink = req.query.webLink;
     const appKey = req.headers.api_key;
 
-    const ads = new Ads(title, posterUrl, webLink);
-
     if (
-      ads.title == undefined ||
-      ads.posterUrl == undefined ||
-      ads.webLink == undefined ||
+      ads.title == null ||
+      ads.posterUrl == null ||
+      ads.webLink == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
+      const ads = new Ads(title, posterUrl, webLink);
       try {
         await AdsEntity.create(ads);
         res.status(201).send({}); // created
@@ -77,7 +76,7 @@ class AdsController {
     const title = req.query.title;
     const appKey = req.headers.api_key;
 
-    if (title == undefined || appKey != process.env.APP_KEY) {
+    if (title == null || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
     } else {
       try {

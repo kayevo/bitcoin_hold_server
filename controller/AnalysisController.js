@@ -8,7 +8,7 @@ class AnalysisController {
     const userId = req.query.userId;
     const appKey = req.headers.api_key;
 
-    if (userId == undefined || appKey != process.env.APP_KEY) {
+    if (userId == null || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
     } else {
       const endpointUrl = process.env.BITCOIN_INFORMATION_URL + `data/price`;

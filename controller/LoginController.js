@@ -9,8 +9,8 @@ class LoginController {
     const appKey = req.headers.api_key;
 
     if (
-      credential.email == undefined ||
-      credential.password == undefined ||
+      credential.email == null ||
+      credential.password == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({});
@@ -44,8 +44,8 @@ class LoginController {
     const appKey = req.headers.api_key;
 
     if (
-      credential.email == undefined ||
-      credential.password == undefined ||
+      credential.email == null ||
+      credential.password == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
@@ -84,7 +84,7 @@ class LoginController {
     const email = req.query.email;
     const appKey = req.headers.api_key;
 
-    if (email == undefined || appKey != process.env.APP_KEY) {
+    if (email == null || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
     } else {
       try {
