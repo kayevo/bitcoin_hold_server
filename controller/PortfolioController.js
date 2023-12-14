@@ -66,7 +66,7 @@ class PortfolioController {
     }
   }
 
-  async addValue(req, res) {
+  async addFunds(req, res) {
     const userId = req.query.userId;
     var amount = req.query.satoshiAmount ?? req.query.amount; // amount in satoshis
     var paidPrice = req.query.bitcoinAveragePrice ?? req.query.paidPrice;
@@ -111,7 +111,7 @@ class PortfolioController {
     }
   }
 
-  async removeValue(req, res) {
+  async removeFunds(req, res) {
     const userId = req.query.userId;
     const amount = req.query.satoshiAmount ?? req.query.amount;
     const appKey = req.headers.api_key;
