@@ -31,24 +31,24 @@ class PortfolioController {
 
   async setPortfolio(req, res) {
     const userId = req.query.userId;
-    const amount = req.query.satoshiAmount ?? req.query.amount;
-    const bitcoinAveragePrice = req.query.bitcoinAveragePrice;
+    const _funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
+    const _bitcoinAveragePrice = req.query.bitcoinAveragePrice;
     const appKey = req.headers.api_key;
 
     if (
       userId == null ||
-      amount == null ||
-      bitcoinAveragePrice == null ||
+      _funds == null ||
+      _bitcoinAveragePrice == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        amount = parseInt(amount);
-        bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
-          parseFloat(bitcoinAveragePrice)
+        const funds = parseInt(_funds);
+        const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
+          parseFloat(_bitcoinAveragePrice)
         );
-        const newPortfolio = new BitcoinPortfolio(amount, bitcoinAveragePrice);
+        const newPortfolio = new BitcoinPortfolio(funds, bitcoinAveragePrice);
 
         UserEntity.updateOne(
           { _id: userId },
@@ -68,21 +68,21 @@ class PortfolioController {
 
   async addFunds(req, res) {
     const userId = req.query.userId;
-    var funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
-    var paidPrice = req.query.bitcoinAveragePrice ?? req.query.paidPrice;
+    var _funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
+    var _paidPrice = req.query.bitcoinAveragePrice ?? req.query.paidPrice;
     const appKey = req.headers.api_key;
 
     if (
       userId == null ||
-      funds == null ||
-      paidPrice == null ||
+      _funds == null ||
+      _paidPrice == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        funds = parseInt(funds);
-        paidPrice = CurrencyHelper.parseToCurrency(parseFloat(paidPrice));
+        const funds = parseInt(_funds);
+        const paidPrice = CurrencyHelper.parseToCurrency(parseFloat(_paidPrice));
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (user) {
             const newPortfolio = new BitcoinPortfolio(
@@ -113,14 +113,14 @@ class PortfolioController {
 
   async removeFunds(req, res) {
     const userId = req.query.userId;
-    const funds = req.query.satoshiAmount ?? req.query.funds;
+    const _funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
     const appKey = req.headers.api_key;
 
-    if (userId == null || funds == null || appKey != process.env.APP_KEY) {
+    if (userId == null || _funds == null || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        funds = parseInt(funds);
+        const funds = parseInt(_funds);
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (!user?.errors && user) {
             if (funds > user.bitcoinPortfolio.satoshiAmount) {
