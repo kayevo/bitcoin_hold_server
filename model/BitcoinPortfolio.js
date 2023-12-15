@@ -14,30 +14,33 @@ class BitcoinPortfolio {
     this.satoshiAmount += _amount;
 
     const totalSatoshiAmount = this.satoshiAmount;
-    if (totalSatoshiAmount !== 0) {
+    const totalValue = this.totalPaidPrice;
+    this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
+      CurrencyHelper.parseBitcoinToSatoshi(totalValue / totalSatoshiAmount)
+    );
+  }
+
+  removeAmount(_amount, _receivedPrice) {
+    if (_amount <= 0 || _amount > this.satoshiAmount) return;
+    if(_amount == this.satoshiAmount){
+      this.resetProperties();
+      return
+    }
+
+    this.totalPaidPrice -= _receivedPrice;
+    this.satoshiAmount -= _amount;
+
+    const totalSatoshiAmount = this.satoshiAmount;
       const totalValue = this.totalPaidPrice;
       this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
         CurrencyHelper.parseBitcoinToSatoshi(totalValue / totalSatoshiAmount)
       );
-    } else {
-      this.bitcoinAveragePrice = 0;
-    }
   }
 
-  removeAmount(_amount) {
-    if (_amount > this.satoshiAmount) {
-      this.#restartPrices;
-      return;
-    }
-    this.satoshiAmount -= _amount;
-    if (this.satoshiAmount == 0) {
-      this.#restartPrices();
-    }
-  }
-
-  #restartPrices() {
+  resetProperties() {
     this.bitcoinAveragePrice = 0;
     this.totalPaidPrice = 0;
+    this.satoshiAmount = 0;
   }
 }
 
