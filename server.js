@@ -12,8 +12,6 @@ databaseConnection();
 
 const app = express();
 
-addFieldTotalPaidOnDocuments()
-
 app.use("/user", loginRouter)
 app.use("/portfolio", portfolioRouter)
 app.use("/ads", adsRouter)
