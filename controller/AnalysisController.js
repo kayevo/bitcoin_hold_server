@@ -35,7 +35,7 @@ class AnalysisController {
                 bitcoinPrice;
               const profits = CurrencyHelper.calculatePercentageProfit(
                 user.bitcoinPortfolio.bitcoinAveragePrice,
-                portfolioValue
+                bitcoinPrice
               );
               res.status(200).send({
                 bitcoinPriceInBrl: response.data.BRL,

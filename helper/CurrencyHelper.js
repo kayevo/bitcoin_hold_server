@@ -20,7 +20,7 @@ class CurrencyHelper {
       return 0.0;
     }
 
-    const percentageProfit = ((_valueWithProfit - _value) / _value) * 100.0;
+    const percentageProfit = this.parseToCurrency(((_valueWithProfit - _value) / _value) * 100.0) ;
     return percentageProfit;
   }
 }
