@@ -31,24 +31,24 @@ class PortfolioController {
 
   async setPortfolio(req, res) {
     const userId = req.query.userId;
-    const _funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
+    const _amount = req.query.satoshiAmount ?? req.query.amount; // amount in satoshis
     const _bitcoinAveragePrice = req.query.bitcoinAveragePrice;
     const appKey = req.headers.api_key;
 
     if (
       userId == null ||
-      _funds == null ||
+      _amount == null ||
       _bitcoinAveragePrice == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        const funds = parseInt(_funds);
+        const amount = parseInt(_amount);
         const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
           parseFloat(_bitcoinAveragePrice)
         );
-        const newPortfolio = new BitcoinPortfolio(funds, bitcoinAveragePrice);
+        const newPortfolio = new BitcoinPortfolio(amount, bitcoinAveragePrice);
 
         UserEntity.updateOne(
           { _id: userId },
@@ -66,31 +66,34 @@ class PortfolioController {
     }
   }
 
-  async addFunds(req, res) {
+  async addAmount(req, res) {
     const userId = req.query.userId;
-    var _funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
+    var _amount = req.query.satoshiAmount ?? req.query.amount; // amount in satoshis
     var _paidPrice = req.query.bitcoinAveragePrice ?? req.query.paidPrice;
     const appKey = req.headers.api_key;
 
     if (
       userId == null ||
-      _funds == null ||
+      _amount == null ||
       _paidPrice == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        const funds = parseInt(_funds);
-        const paidPrice = CurrencyHelper.parseToCurrency(parseFloat(_paidPrice));
+        const amount = parseInt(_amount);
+        const paidPrice = CurrencyHelper.parseToCurrency(
+          parseFloat(_paidPrice)
+        );
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (user) {
             const newPortfolio = new BitcoinPortfolio(
               user.bitcoinPortfolio.satoshiAmount,
-              user.bitcoinPortfolio.bitcoinAveragePrice
+              user.bitcoinPortfolio.bitcoinAveragePrice,
+              user.bitcoinPortfolio.totalPaidPrice
             );
 
-            newPortfolio.addFunds(funds, paidPrice);
+            newPortfolio.addAmount(amount, paidPrice);
             UserEntity.updateOne(
               { _id: userId },
               { bitcoinPortfolio: newPortfolio }
@@ -111,26 +114,27 @@ class PortfolioController {
     }
   }
 
-  async removeFunds(req, res) {
+  async removeAmount(req, res) {
     const userId = req.query.userId;
-    const _funds = req.query.satoshiAmount ?? req.query.funds; // amount in satoshis
+    const _amount = req.query.satoshiAmount ?? req.query.amount; // amount in satoshis
     const appKey = req.headers.api_key;
 
-    if (userId == null || _funds == null || appKey != process.env.APP_KEY) {
+    if (userId == null || _amount == null || appKey != process.env.APP_KEY) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        const funds = parseInt(_funds);
+        const amount = parseInt(_amount);
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (!user?.errors && user) {
-            if (funds > user.bitcoinPortfolio.satoshiAmount) {
+            if (amount > user.bitcoinPortfolio.satoshiAmount) {
               res.status(401).send({}); // Unauthorized
             } else {
               const newPortfolio = new BitcoinPortfolio(
                 user.bitcoinPortfolio.satoshiAmount,
-                user.bitcoinPortfolio.bitcoinAveragePrice
+                user.bitcoinPortfolio.bitcoinAveragePrice,
+                user.bitcoinPortfolio.totalPaidPrice
               );
-              newPortfolio.removeFunds(funds);
+              newPortfolio.removeAmount(amount);
 
               UserEntity.updateOne(
                 { _id: userId },

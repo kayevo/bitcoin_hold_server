@@ -1,5 +1,6 @@
 const UserEntity = require(".././entity/UserEntity");
 const Credential = require(".././model/Credential");
+const BitcoinPortfolio = require("../model/BitcoinPortfolio");
 
 const deleteMockUsers = () => {
   UserEntity.deleteMany({ $expr: { $lt: [{ $strLenCP: "$email" }, 4] } }).then(
@@ -77,9 +78,33 @@ const encryptFieldsAfterUserCreated = () => {
     });
 };
 
+const addFieldTotalPaidOnDocuments = () => {
+  UserEntity.find()
+    .then((existingUsers) => {
+      existingUsers.forEach((existingUser) => {
+        existingUser.bitcoinPortfolio = new BitcoinPortfolio(0, 0, 0)
+        existingUser
+          .save()
+          .then((savedUser) => {
+            console.log(`Updated user with email: ${savedUser.email}`);
+          })
+          .catch((updateError) => {
+            console.error(
+              `Error updating user with email: ${existingUser.email}`,
+              updateError
+            );
+          });
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching existing users", error);
+    });
+};
+
 module.exports = {
   deleteMockUsers,
   createUsersWithHash,
   deleteUsersWithoutHash,
   encryptFieldsAfterUserCreated,
+  addFieldTotalPaidOnDocuments,
 };

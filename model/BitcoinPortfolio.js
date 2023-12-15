@@ -1,29 +1,43 @@
 const CurrencyHelper = require("../helper/CurrencyHelper");
 
 class BitcoinPortfolio {
-  constructor(_satoshiAmount, _bitcoinAveragePrice) {
+  constructor(_satoshiAmount, _bitcoinAveragePrice, _totalPaidPrice) {
     this.satoshiAmount = _satoshiAmount;
     this.bitcoinAveragePrice = _bitcoinAveragePrice;
+    this.totalPaidPrice = _totalPaidPrice;
   }
 
-  addFunds(_funds, _paidPrice) {
-    this.satoshiAmount += _funds;
-    this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
-      CurrencyHelper.parseBitcoinToSatoshi(
-        (this.bitcoinAveragePrice + _paidPrice) / this.satoshiAmount
-      )
-    );
-  }
+  addAmount(_amount, _paidPrice) {
+    if (_amount <= 0) return;
 
-  removeFunds(_funds) {
-    this.satoshiAmount -= _funds;
-    if (this.satoshiAmount == 0) {
-      this.#restartAveragePrice();
+    this.totalPaidPrice += _paidPrice;
+    this.satoshiAmount += _amount;
+
+    const totalSatoshiAmount = this.satoshiAmount;
+    if (totalSatoshiAmount !== 0) {
+      const totalValue = this.totalPaidPrice;
+      this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
+        CurrencyHelper.parseBitcoinToSatoshi(totalValue / totalSatoshiAmount)
+      );
+    } else {
+      this.bitcoinAveragePrice = 0;
     }
   }
 
-  #restartAveragePrice() {
+  removeAmount(_amount) {
+    if (_amount > this.satoshiAmount) {
+      this.#restartPrices;
+      return;
+    }
+    this.satoshiAmount -= _amount;
+    if (this.satoshiAmount == 0) {
+      this.#restartPrices();
+    }
+  }
+
+  #restartPrices() {
     this.bitcoinAveragePrice = 0;
+    this.totalPaidPrice = 0;
   }
 }
 

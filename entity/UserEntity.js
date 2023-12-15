@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   bitcoinPortfolio: {
     satoshiAmount: Number, // integer number in satoshis
     bitcoinAveragePrice: Number, // decimal number with 2 decimals precision
+    totalPaidPrice: Number, // decimal number with 2 decimals precision
   },
 });
 
