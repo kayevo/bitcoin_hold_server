@@ -1,6 +1,6 @@
 const UserEntity = require(".././entity/UserEntity");
 const Credential = require(".././model/Credential");
-const BitcoinPortfolio = require("../model/BitcoinPortfolio");
+const Portfolio = require("../model/Portfolio");
 
 const deleteMockUsers = () => {
   UserEntity.deleteMany({ $expr: { $lt: [{ $strLenCP: "$email" }, 4] } }).then(
@@ -82,7 +82,7 @@ const addFieldTotalPaidOnDocuments = () => {
   UserEntity.find()
     .then((existingUsers) => {
       existingUsers.forEach((existingUser) => {
-        existingUser.bitcoinPortfolio = new BitcoinPortfolio(0, 0, 0)
+        existingUser.bitcoinPortfolio = new Portfolio();
         existingUser
           .save()
           .then((savedUser) => {

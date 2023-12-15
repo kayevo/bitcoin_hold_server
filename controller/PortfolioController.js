@@ -1,6 +1,6 @@
 require("dotenv").config();
 const UserEntity = require(".././entity/UserEntity");
-const BitcoinPortfolio = require(".././model/BitcoinPortfolio");
+const Portfolio = require("../model/Portfolio");
 const CurrencyHelper = require(".././helper/CurrencyHelper");
 
 class PortfolioController {
@@ -32,23 +32,24 @@ class PortfolioController {
   async setPortfolio(req, res) {
     const userId = req.query.userId;
     const _amount = req.query.satoshiAmount ?? req.query.amount; // amount in satoshis
-    const _bitcoinAveragePrice = req.query.bitcoinAveragePrice;
+    const _totalPaidValue = req.query.totalPaidValue;
     const appKey = req.headers.api_key;
 
     if (
       userId == null ||
       _amount == null ||
-      _bitcoinAveragePrice == null ||
+      _totalPaidValue == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
       try {
-        const amount = parseInt(_amount);
-        const bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
-          parseFloat(_bitcoinAveragePrice)
+        const totalPaidValue = CurrencyHelper.parseToCurrency(
+          parseFloat(_totalPaidValue)
         );
-        const newPortfolio = new BitcoinPortfolio(amount, bitcoinAveragePrice);
+        const amount = parseInt(_amount);
+        const newPortfolio = new Portfolio();
+        newPortfolio.addAmount(amount, totalPaidValue);
 
         UserEntity.updateOne(
           { _id: userId },
@@ -87,13 +88,13 @@ class PortfolioController {
         );
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (user) {
-            const newPortfolio = new BitcoinPortfolio(
-              user.bitcoinPortfolio.satoshiAmount,
-              user.bitcoinPortfolio.bitcoinAveragePrice,
+            const newPortfolio = new Portfolio(
+              user.bitcoinPortfolio.amount,
+              user.bitcoinPortfolio.averagePrice,
               user.bitcoinPortfolio.totalPaidValue
             );
-
             newPortfolio.addAmount(amount, paidValue);
+
             UserEntity.updateOne(
               { _id: userId },
               { bitcoinPortfolio: newPortfolio }
@@ -135,12 +136,12 @@ class PortfolioController {
         );
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (!user?.errors && user) {
-            if (amount > user.bitcoinPortfolio.satoshiAmount) {
+            if (amount > user.bitcoinPortfolio.amount) {
               res.status(401).send({}); // Unauthorized
             } else {
-              const newPortfolio = new BitcoinPortfolio(
-                user.bitcoinPortfolio.satoshiAmount,
-                user.bitcoinPortfolio.bitcoinAveragePrice,
+              const newPortfolio = new Portfolio(
+                user.bitcoinPortfolio.amount,
+                user.bitcoinPortfolio.averagePrice,
                 user.bitcoinPortfolio.totalPaidValue
               );
               newPortfolio.removeAmount(amount, receivedValue);

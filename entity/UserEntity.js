@@ -13,10 +13,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  bitcoinPortfolio: {
-    satoshiAmount: Number, // integer number in satoshis
-    bitcoinAveragePrice: Number, // decimal number with 2 decimals precision
-    totalPaidValue: Number, // decimal number with 2 decimals precision
+  bitcoinPortfolio:{ 
+    amount: {  // integer number in satoshis unit
+      type: Number,
+      required: false,
+    },
+    averagePrice: { // decimal number with 2 decimals precision per bitcoin price
+      type: Number,
+      required: false,
+    },
+    totalPaidValue: {
+      type: Number,
+      required: false,
+    },
   },
 });
 

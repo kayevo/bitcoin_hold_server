@@ -28,13 +28,12 @@ class AnalysisController {
         .then((response) => {
           UserEntity.findOne({ _id: userId })
             .then((user) => {
-              const satoshisAmount = user.bitcoinPortfolio.satoshiAmount;
+              const amount = user.bitcoinPortfolio.amount;
               const bitcoinPrice = response.data.BRL;
               const portfolioValue =
-                CurrencyHelper.parseSatoshiToBitcoin(satoshisAmount) *
-                bitcoinPrice;
+                CurrencyHelper.parseSatoshiToBitcoin(amount) * bitcoinPrice;
               const profits = CurrencyHelper.calculatePercentageProfit(
-                user.bitcoinPortfolio.bitcoinAveragePrice,
+                user.bitcoinPortfolio.averagePrice,
                 bitcoinPrice
               );
               res.status(200).send({
