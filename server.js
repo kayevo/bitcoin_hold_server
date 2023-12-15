@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const databaseConnection = require("./data/database");
-const { deleteMockUsers } = require("./helper/DatabaseHelper");
+const { deleteMockUsers, addFieldTotalPaidOnDocuments } = require("./helper/DatabaseHelper");
 const loginRouter = require('./router/LoginRouter');
 const portfolioRouter = require('./router/PortfolioRouter')
 const adsRouter = require('./router/AdsRouter')
@@ -11,6 +11,8 @@ const analysisRouter = require('./router/AnalysisRouter')
 databaseConnection();
 
 const app = express();
+
+addFieldTotalPaidOnDocuments()
 
 app.use("/user", loginRouter)
 app.use("/portfolio", portfolioRouter)

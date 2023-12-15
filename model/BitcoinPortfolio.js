@@ -1,37 +1,37 @@
 const CurrencyHelper = require("../helper/CurrencyHelper");
 
 class BitcoinPortfolio {
-  constructor(_satoshiAmount, _bitcoinAveragePrice, _totalPaidPrice) {
+  constructor(_satoshiAmount, _bitcoinAveragePrice, _totalPaidValue) {
     this.satoshiAmount = _satoshiAmount;
     this.bitcoinAveragePrice = _bitcoinAveragePrice;
-    this.totalPaidPrice = _totalPaidPrice;
+    this.totalPaidValue = _totalPaidValue;
   }
 
-  addAmount(_amount, _paidPrice) {
+  addAmount(_amount, _paidValue) {
     if (_amount <= 0) return;
 
-    this.totalPaidPrice += _paidPrice;
+    this.totalPaidValue += _paidValue;
     this.satoshiAmount += _amount;
 
     const totalSatoshiAmount = this.satoshiAmount;
-    const totalValue = this.totalPaidPrice;
+    const totalValue = this.totalPaidValue;
     this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
       CurrencyHelper.parseBitcoinToSatoshi(totalValue / totalSatoshiAmount)
     );
   }
 
-  removeAmount(_amount, _receivedPrice) {
+  removeAmount(_amount, _receivedValue) {
     if (_amount <= 0 || _amount > this.satoshiAmount) return;
     if(_amount == this.satoshiAmount){
       this.resetProperties();
       return
     }
 
-    this.totalPaidPrice -= _receivedPrice;
+    this.totalPaidValue -= _receivedValue;
     this.satoshiAmount -= _amount;
 
     const totalSatoshiAmount = this.satoshiAmount;
-      const totalValue = this.totalPaidPrice;
+      const totalValue = this.totalPaidValue;
       this.bitcoinAveragePrice = CurrencyHelper.parseToCurrency(
         CurrencyHelper.parseBitcoinToSatoshi(totalValue / totalSatoshiAmount)
       );
@@ -39,7 +39,7 @@ class BitcoinPortfolio {
 
   resetProperties() {
     this.bitcoinAveragePrice = 0;
-    this.totalPaidPrice = 0;
+    this.totalPaidValue = 0;
     this.satoshiAmount = 0;
   }
 }
