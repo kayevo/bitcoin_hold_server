@@ -30,15 +30,15 @@ class AnalysisController {
             .then((user) => {
               const amount = user.bitcoinPortfolio.amount;
               const bitcoinPrice = response.data.BRL;
-              const portfolioValue =
+              const amountValue =
                 CurrencyHelper.parseSatoshiToBitcoin(amount) * bitcoinPrice;
               const profits = CurrencyHelper.calculatePercentageProfit(
                 user.bitcoinPortfolio.averagePrice,
                 bitcoinPrice
               );
               res.status(200).send({
-                bitcoinPriceInBrl: response.data.BRL,
-                portfolioValue,
+                bitcoinPriceInBrl: bitcoinPrice,
+                amountValue,
                 profits,
               });
             })
