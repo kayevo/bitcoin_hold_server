@@ -21,21 +21,20 @@ class Portfolio {
     );
   }
 
-  removeAmount(_amount, _receivedValue) {
+  removeAmount(_amount) {
     if (_amount <= 0 || _amount > this.amount) return;
     if (_amount == this.amount) {
       this.resetProperties();
       return;
     }
 
-    this.totalPaidValue -= _receivedValue;
-    this.amount -= _amount;
-
-    const totalSatoshiAmount = this.amount;
-    const totalValue = this.totalPaidValue;
-    this.averagePrice = CurrencyHelper.parseToCurrency(
-      CurrencyHelper.parseBitcoinToSatoshi(totalValue / totalSatoshiAmount)
+    const resultAmount = this.amount - _amount;
+    const resultTotalPaidValue = CurrencyHelper.parseToCurrency(
+      (this.totalPaidValue * resultAmount) / this.amount
     );
+
+    this.amount = resultAmount;
+    this.totalPaidValue = resultTotalPaidValue;
   }
 
   resetProperties() {

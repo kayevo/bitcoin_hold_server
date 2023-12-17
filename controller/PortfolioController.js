@@ -118,22 +118,17 @@ class PortfolioController {
   async removeAmount(req, res) {
     const userId = req.query.userId;
     const _amount = req.query.satoshiAmount ?? req.query.amount; // amount in satoshis
-    const _receivedValue = req.query.receivedValue;
     const appKey = req.headers.api_key;
 
     if (
       userId == null ||
       _amount == null ||
-      _receivedValue == null ||
       appKey != process.env.APP_KEY
     ) {
       res.status(400).send({}); // bad request
     } else {
       try {
         const amount = parseInt(_amount);
-        const receivedValue = CurrencyHelper.parseToCurrency(
-          parseFloat(_receivedValue)
-        );
         UserEntity.findOne({ _id: userId }).then((user) => {
           if (!user?.errors && user) {
             if (amount > user.bitcoinPortfolio.amount) {
@@ -144,7 +139,7 @@ class PortfolioController {
                 user.bitcoinPortfolio.averagePrice,
                 user.bitcoinPortfolio.totalPaidValue
               );
-              newPortfolio.removeAmount(amount, receivedValue);
+              newPortfolio.removeAmount(amount);
 
               UserEntity.updateOne(
                 { _id: userId },
