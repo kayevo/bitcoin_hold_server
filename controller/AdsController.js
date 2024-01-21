@@ -19,8 +19,7 @@ function getRandomInt(min, max) {
           if (ads?.errors) {
             res.status(500).send({ error: ads?.errors });
           } else {
-            let adsLength = ads.length
-            let randomIndex = getRandomInt(0, adsLength-1)
+            const randomIndex = getRandomInt(0, ads.length - 1)
             res.status(200).send(ads[randomIndex]);
           }
         });
