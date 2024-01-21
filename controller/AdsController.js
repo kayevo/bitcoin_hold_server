@@ -17,7 +17,6 @@ class AdsController {
           } else {
             const min = 0
             const max = ads.length - 1
-            console.log(max)
             const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
             res.status(200).send(ads[randomIndex]);
           }
