@@ -3,7 +3,34 @@ const AdsEntity = require(".././entity/AdsEntity");
 const Ads = require(".././model/Ads");
 
 class AdsController {
-  async getAds(req, res) {
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+    async getAds(req, res) {
+    const appKey = req.headers.api_key;
+
+    if (appKey != process.env.APP_KEY) {
+      res.status(400).send({}); // bad request
+    } else {
+      try {
+        AdsEntity.find().then((ads) => {
+          if (ads?.errors) {
+            res.status(500).send({ error: ads?.errors });
+          } else {
+            let adsLength = ads.length
+            let randomIndex = getRandomInt(0, adsLength-1)
+            res.status(200).send(ads[randomIndex]);
+          }
+        });
+      } catch (error) {
+        res.status(500).send({});
+      }
+    }
+  }
+
+  async getAllAds(req, res) {
     const appKey = req.headers.api_key;
 
     if (appKey != process.env.APP_KEY) {
