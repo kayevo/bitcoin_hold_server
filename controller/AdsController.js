@@ -4,10 +4,6 @@ const Ads = require(".././model/Ads");
 
 class AdsController {
 
-    getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
     async getAds(req, res) {
     const appKey = req.headers.api_key;
 
@@ -19,7 +15,9 @@ class AdsController {
           if (ads?.errors) {
             res.status(500).send({ error: ads?.errors });
           } else {
-            const randomIndex = this.getRandomInt(0, ads.length - 1)
+            const min = 0
+            const max = ads.length - 1
+            const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
             res.status(200).send(ads[randomIndex]);
           }
         });
